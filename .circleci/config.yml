@@ -16,6 +16,13 @@ jobs: # basic units of work in a run
       - image: circleci/node:10.0-browsers
       #-image: leyo007/get-started:part2
     steps: # steps that comprise the `build` job
+#new start
+  - run:
+      name: Setup Environment Variables
+      command: |
+        echo 'export PATH="$GOPATH/bin:$PATH"' >> $BASH_ENV
+        echo 'export GIT_SHA1="$CIRCLE_SHA1"' >> $BASH_ENV
+#new end        
       - checkout # check out source code to working directory
       # Run a step to setup an environment variable.
       - run: 
