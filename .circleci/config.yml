@@ -7,11 +7,12 @@ jobs:
      # start proprietary DB using private Docker image
      # with credentials stored in the UI
      - run: |
-         docker login -u $DOCKER_USER -p $DOCKER_PASS
-         docker run -d --name db company/proprietary-db:1.2.3
+         docker login -u leyo007 --password-stdin
+         docker run -d leyo007/get-started:part2
+
 
      # build the application image
-     - run: docker build -t company/app:$CIRCLE_BRANCH .
+     - run: docker build --tag=friendlyhello .
 
      # deploy the image
-     - run: docker push company/app:$CIRCLE_BRANCH
+     #- run: docker push company/app:$CIRCLE_BRANCH
