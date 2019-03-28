@@ -1,18 +1,30 @@
 version: 2
 jobs:
- build:
-   machine: true
-   steps:
-     - checkout
-     # start proprietary DB using private Docker image
-     # with credentials stored in the UI
-     - run: |
-         docker login -u leyo007 --password-stdin
-         docker run -d leyo007/get-started:part2
+  build:
+    docker:
+      - image: golang:1.6.4-jessie   # (1)
+    working_directory: /go/src/github.com/CircleCI-Public/circleci-demo-docker
+    steps:
+      - checkout
+      # ... steps for building/testing app ...
 
+      - setup_remote_docker:   # (2)
+          docker_layer_caching: true # (3)
 
-     # build the application image
-     - run: docker build --tag=friendlyhello .
+      # use a primary image that already has Docker (recommended)
+      # or install it during a build like we do here
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
 
-     # deploy the image
-     #- run: docker push company/app:$CIRCLE_BRANCH
+      # build and push Docker image
+      - run: |
+          TAG=0.1.$CIRCLE_BUILD_NUM
+          docker build -t   CircleCI-Public/circleci-demo-docker:$TAG .     
+          docker login -u $DOCKER_USER -p $DOCKER_PASS         # (4)
+          docker push CircleCI-Public/circleci-demo-docker:$TAG
